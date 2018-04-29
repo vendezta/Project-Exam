@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>MFEC Report</title>
+<script src="./js/jquery-1.11.3.js"></script>
+<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js" integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E="   crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/3.5.1/js/tabulator.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/3.5.1/css/tabulator.min.css" rel="stylesheet">
+
+<style type="text/css">
+	#f1_upload_process{
+	   z-index:100;
+	   position:absolute;
+	   visibility:hidden;
+	   text-align:center;
+	   width:100%;
+	   left: auto;
+	   right: 0px;
+	   margin:0px auto;
+	   padding:0px;
+	   background-color:#fff;
+	   min-height: 700px;
+	}
+	 
+	form{
+	   text-align:center;
+	   width:450px;
+	   margin:0px;
+	   padding:5px;
+	   background-color:#fff;
+	   border:1px solid #ccc;
+	 
+	}
+	
+	#mfecReport {
+		width: 470px;
+	    margin: 0px auto;
+	}
+</style>
+</head>
+<body>
+
+<p id="f1_upload_process">Loading...<br/><img src="./img/loader.gif" style="width: 50%;" /></p>
+<p id="result"></p>
+<form action="" method="post" enctype="multipart/form-data" target="upload_target" >
+    Input your log file : <input name="fileData" id="fileData" type="file" onclick="visibleTextNotice();" /> 
+          <input type="submit" name="submitBtn" value="Upload" />
+</form>
+<br>
+<span style="color: red;visibility: hidden;" id="textNotice" >System exported Json file to C:\\MFEC_temp\\data.json path on your computer.</span>   
+<div style=" text-align: center; padding-top: 50px; padding-bottom: 10px;">
+	<span style="color: blue;visibility: hidden; font-weight: bold;" id="reportTopic" >MFEC REPORT</span>   
+</div>
+<div id="mfecReport"></div>
+
+</body>
+<script type="text/javascript">
+
+var form = document.querySelector("form");
+
+$( document ).ready(function() {
+		
+	$(window).resize(function(){
+	  $("#mfecReport").tabulator("redraw");
+	});
+
+	if (!window.File && !window.FileList && !window.Blob && !window.FileReader && !window.FormData) {
+		alert("browser doesn't supports");
+	}
+});
+
+function visibleProgress(){	
+	document.getElementById('f1_upload_process').style.visibility = 'hidden';
+}
+function visibleTextNotice(){	
+	document.getElementById('textNotice').style.visibility = 'hidden';
+}
+var ajaxFileUpload = function (data) {
+	document.getElementById('f1_upload_process').style.visibility = 'visible';
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "./InitServlet", true);
+    xhr.addEventListener("load", function (e) {
+        // file upload is complete        
+        $("#mfecReport").tabulator({
+        	  height:"550px",
+         	  columns:[
+         	    {title:"MobileNo", field:"mobileNo", sortable:true},
+         	    {title:"PromotionType", field:"promotionType", sortable:true, sorter:"number"},
+         	    {title:"ChargeAmount", field:"chargeAmount", sortable:true},
+         	    {title:"TotalCallTime", field:"totalCallTime", sortable:false},
+         	  ],
+        });
+
+  		var jsonDataObj=JSON.parse(xhr.responseText);
+  		
+  		document.getElementById('reportTopic').style.visibility = 'visible';
+  		$("#mfecReport").tabulator("setData", jsonDataObj);
+        
+        setTimeout(visibleProgress, 3000);
+        document.getElementById('textNotice').style.visibility = 'visible';
+        
+    });
+    xhr.send(data);
+};
+
+form.addEventListener("submit", function (e) {
+    var fdata = new FormData(this);
+
+    if( document.getElementById("fileData").files.length == 0 ){
+        alert("no files selected");
+    }else{
+    	 ajaxFileUpload(fdata);
+    }
+
+    // Prevents the standard submit event
+    e.preventDefault();
+    return false;
+}, false);
+
+</script>
+</html>
