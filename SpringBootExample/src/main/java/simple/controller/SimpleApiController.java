@@ -13,7 +13,7 @@ import simple.model.CustomerBean;
 @RequestMapping("/simpleAPI")
 public class SimpleApiController {
 
-	@ApiOperation(value = "Response the variable name", response = String.class)
+	@ApiOperation(value = "Response the variable name", response = String.class)	
     @RequestMapping(value = "/show/name/{firstName}", method= RequestMethod.GET)
     public String showName(@PathVariable String firstName){
 
@@ -26,7 +26,6 @@ public class SimpleApiController {
 
         return "Your name is " + name + ", you are " + age + " years old.";
     }
-
 
     @ApiOperation(value = "Response Person object ", response = CustomerBean.class)
     @RequestMapping(value = "/show/person", method= RequestMethod.PUT)
